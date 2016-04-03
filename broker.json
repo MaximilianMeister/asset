@@ -1,0 +1,58 @@
+{
+  "consors": {
+    "name": "Consors Bank",
+    "basic_price": 4.95,
+    "commission_rate": 0.0025,
+    "min_rate": 9.95,
+    "max_rate": 69.0
+  },
+  "ingdiba": {
+    "name": "ING DiBa",
+    "basic_price": 0,
+    "commission_rate": 0.0025,
+    "min_rate": 9.9,
+    "max_rate": 59.9
+  },
+  "comdirect": {
+    "name": ".comdirect",
+    "basic_price": 4.9,
+    "commission_rate": 0.0025,
+    "min_rate": 9.9,
+    "max_rate": 59.9
+  },
+  "sbroker": {
+    "name": "SBroker",
+    "basic_price": 4.95,
+    "commission_rate": 0.0025,
+    "min_rate": 9.95,
+    "max_rate": 49.95
+  },
+  "maxblue": {
+    "name": "maxblue",
+    "basic_price": 0,
+    "commission_rate": 0.0025,
+    "min_rate": 7.9,
+    "max_rate": 39.9
+  },
+  "onvista": {
+    "name": "OnVista Bank",
+    "basic_price": 5.99,
+    "commission_rate": 0.0023,
+    "min_rate": 5.99,
+    "max_rate": 39
+  },
+  "dab": {
+    "name": "DAB bank",
+    "basic_price": 4.95,
+    "commission_rate": 0.0025,
+    "min_rate": 3.99,
+    "max_rate": 55
+  },
+  "targo": {
+    "name": "Targo Bank",
+    "basic_price": 0,
+    "commission_rate": 0.0025,
+    "min_rate": 8.9,
+    "max_rate": 34.9
+  }
+}
