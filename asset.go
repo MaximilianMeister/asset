@@ -43,7 +43,7 @@ func IsBroker(brokerAlias string) bool {
 	return false
 }
 
-func GetBroker(brokerAlias string) Broker {
+func FindBroker(brokerAlias string) Broker {
 	if IsBroker(brokerAlias) {
 		register := BrokerRegister()
 		for b := range register {
@@ -79,7 +79,7 @@ func RiskRewardRatio(o Order) float64 {
 func TotalCommission(o Order, brokerAlias string) (commission float64) {
 	commission = 0.0
 
-	broker := GetBroker(brokerAlias)
+	broker := FindBroker(brokerAlias)
 	volumeRateBuy := float64(Amount(o)) * o.actual * broker.CommissionRate
 	volumeRateSell := float64(Amount(o)) * o.target * broker.CommissionRate
 

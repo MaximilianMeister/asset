@@ -9,7 +9,7 @@ var stopLossTests = []struct {
 	{3.2, 4.5, 3.2}, // stop loss higher than or same as actual price
 }
 
-var getBrokerTests = []struct {
+var findBrokerTests = []struct {
 	brokerAlias string
 	expected    Broker
 }{

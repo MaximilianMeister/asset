@@ -33,14 +33,14 @@ func TestIsBroker(t *testing.T) {
 	t.Log(len(isBrokerTests), "test cases")
 }
 
-func TestGetBroker(t *testing.T) {
-	for _, n := range getBrokerTests {
-		b := GetBroker(n.brokerAlias)
+func TestFindBroker(t *testing.T) {
+	for _, n := range findBrokerTests {
+		b := FindBroker(n.brokerAlias)
 		if b != n.expected {
 			t.Error("Can't get Broker")
 		}
 	}
-	t.Log(len(getBrokerTests), "test cases")
+	t.Log(len(findBrokerTests), "test cases")
 }
 
 func TestCreateOrder(t *testing.T) {
