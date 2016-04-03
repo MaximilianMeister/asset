@@ -1,15 +1,19 @@
 package asset
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 )
 
 func TestStopLoss(t *testing.T) {
 	for _, n := range stopLossTests {
-		sl := StopLoss(n.actual, n.stop)
+		sl, err := StopLoss(n.actual, n.stop);
+		if err != nil && n.errExpected == false {
+			t.Error(err)
+		}
 		if sl != n.expected {
-			t.Error("Can't calculate stop loss")
+			t.Error(fmt.Sprintf("%s should be %s", sl, n.expected))
 		}
 	}
 	t.Log(len(stopLossTests), "test cases")

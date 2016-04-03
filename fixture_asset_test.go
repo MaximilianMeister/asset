@@ -4,9 +4,11 @@ var stopLossTests = []struct {
 	actual   float64
 	stop     float64
 	expected float64
+	errExpected bool
 }{
-	{3.4, 3.0, 3.0},
-	{3.2, 4.5, 3.2}, // stop loss higher than or same as actual price
+	{3.4, 3.0, 3.0, false},
+	{3.2, 3.2, 3.2, true}, // stop loss same as actual price
+	{3.2, 4.5, 3.2, true}, // stop loss higher than actual price
 }
 
 var findBrokerTests = []struct {

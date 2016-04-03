@@ -56,12 +56,12 @@ func FindBroker(brokerAlias string) Broker {
 	return Broker{}
 }
 
-func StopLoss(actual, stop float64) float64 {
+func StopLoss(actual, stop float64) (float64, error) {
 	if stop >= actual {
-		return actual
+		return actual, &higherLowerError{stop, actual}
 	}
 
-	return stop
+	return stop, nil
 }
 
 func RiskRewardRatio(o Order) float64 {
