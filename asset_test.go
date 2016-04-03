@@ -45,7 +45,7 @@ func TestFindBroker(t *testing.T) {
 
 func TestCreateOrder(t *testing.T) {
 	for _, n := range orderTests {
-		o := New(Order{n.brokerAlias, n.volume, n.target, n.actual, n.stop})
+		o := Order{n.brokerAlias, n.volume, n.target, n.actual, n.stop}
 		if reflect.TypeOf(o).String() != "asset.Order" {
 			t.Error("Not of type Order")
 		}
@@ -55,7 +55,7 @@ func TestCreateOrder(t *testing.T) {
 
 func TestRiskRewardRatio(t *testing.T) {
 	for _, n := range orderTests {
-		o := New(Order{n.brokerAlias, n.volume, n.target, n.actual, n.stop})
+		o := Order{n.brokerAlias, n.volume, n.target, n.actual, n.stop}
 		rrr := RiskRewardRatio(o)
 		if reflect.TypeOf(rrr).String() != "float64" {
 			t.Error("Not of type float64")
@@ -66,7 +66,7 @@ func TestRiskRewardRatio(t *testing.T) {
 
 func TestTotalCommission(t *testing.T) {
 	for _, n := range orderTests {
-		o := New(Order{n.brokerAlias, n.volume, n.target, n.actual, n.stop})
+		o := Order{n.brokerAlias, n.volume, n.target, n.actual, n.stop}
 		totalCommission := TotalCommission(o, n.brokerAlias)
 		if totalCommission != n.commission {
 			t.Error("Failed to determine total commision")
@@ -77,7 +77,7 @@ func TestTotalCommission(t *testing.T) {
 
 func TestAmount(t *testing.T) {
 	for _, n := range orderTests {
-		o := New(Order{n.brokerAlias, n.volume, n.target, n.actual, n.stop})
+		o := Order{n.brokerAlias, n.volume, n.target, n.actual, n.stop}
 		if Amount(o) != n.amount {
 			t.Error("Failed to determine total amount")
 		}
@@ -87,7 +87,7 @@ func TestAmount(t *testing.T) {
 
 func TestGain(t *testing.T) {
 	for _, n := range orderTests {
-		o := New(Order{n.brokerAlias, n.volume, n.target, n.actual, n.stop})
+		o := Order{n.brokerAlias, n.volume, n.target, n.actual, n.stop}
 		if Gain(o, n.brokerAlias) != n.gain {
 			t.Error("Failed to determine maximum gain")
 		}
@@ -97,7 +97,7 @@ func TestGain(t *testing.T) {
 
 func TestLoss(t *testing.T) {
 	for _, n := range orderTests {
-		o := New(Order{n.brokerAlias, n.volume, n.target, n.actual, n.stop})
+		o := Order{n.brokerAlias, n.volume, n.target, n.actual, n.stop}
 		if Loss(o, n.brokerAlias) != n.loss {
 			t.Error("Failed to determine maximum loss")
 		}
@@ -107,7 +107,7 @@ func TestLoss(t *testing.T) {
 
 func TestEven(t *testing.T) {
 	for _, n := range orderTests {
-		o := New(Order{n.brokerAlias, n.volume, n.target, n.actual, n.stop})
+		o := Order{n.brokerAlias, n.volume, n.target, n.actual, n.stop}
 		if Even(o, n.brokerAlias) != n.even {
 			t.Error("Failed to determine break even")
 		}

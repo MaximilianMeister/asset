@@ -64,10 +64,6 @@ func StopLoss(actual, stop float64) float64 {
 	return stop
 }
 
-func New(o Order) Order {
-	return o
-}
-
 func RiskRewardRatio(o Order) float64 {
 	chance := o.target - o.actual
 	risk := o.actual - o.stop
