@@ -10,32 +10,32 @@ var stopLossTests = []struct {
 }
 
 var getBrokerTests = []struct {
-	shortName string
-	expected  Broker
+	brokerAlias string
+	expected    Broker
 }{
 	{"consors", Broker{"Consors Bank", 4.95, 0.0025, 9.95, 69.0}},
 }
 
 var isBrokerTests = []struct {
-	shortName string
-	expected  bool
+	brokerAlias string
+	expected    bool
 }{
 	{"consors", true},
 	{"bonsors", false},
 }
 
 var orderTests = []struct {
-	broker     string
-	volume     uint32
-	target     float64
-	actual     float64
-	stop       float64
-	commission float64
-	amount     uint32
-	gain       float64
-	loss       float64
-	even       float64
-	rrr        float64
+	brokerAlias string
+	volume      uint32
+	target      float64
+	actual      float64
+	stop        float64
+	commission  float64
+	amount      uint32
+	gain        float64
+	loss        float64
+	even        float64
+	rrr         float64
 }{
 	{"consors", 1000, 3.56, 3.01, 2.87, 19.9, 332, 162.03, 67.06, 3.08, 2.1},
 	{"ingdiba", 2000, 38.56, 32.01, 29.87, 19.8, 62, 370.93, 167.86, 32.58, 3.1},

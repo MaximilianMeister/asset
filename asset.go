@@ -18,7 +18,7 @@ type Broker struct {
 type Brokers map[string]Broker
 
 type Order struct {
-	broker               string
+	brokerAlias          string
 	volume               uint32
 	target, actual, stop float64
 }
@@ -34,20 +34,20 @@ func BrokerRegister() (brokers Brokers) {
 	return
 }
 
-func IsBroker(shortName string) bool {
+func IsBroker(brokerAlias string) bool {
 	for b := range BrokerRegister() {
-		if b == shortName {
+		if b == brokerAlias {
 			return true
 		}
 	}
 	return false
 }
 
-func GetBroker(shortName string) Broker {
-	if IsBroker(shortName) {
+func GetBroker(brokerAlias string) Broker {
+	if IsBroker(brokerAlias) {
 		register := BrokerRegister()
 		for b := range register {
-			if b == shortName {
+			if b == brokerAlias {
 				return register[b]
 			}
 		}
@@ -76,10 +76,10 @@ func RiskRewardRatio(o Order) float64 {
 	return RoundDown(float64(rrr), 1)
 }
 
-func TotalCommission(o Order, shortName string) (commission float64) {
+func TotalCommission(o Order, brokerAlias string) (commission float64) {
 	commission = 0.0
 
-	broker := GetBroker(shortName)
+	broker := GetBroker(brokerAlias)
 	volumeRateBuy := float64(Amount(o)) * o.actual * broker.CommissionRate
 	volumeRateSell := float64(Amount(o)) * o.target * broker.CommissionRate
 
