@@ -9,10 +9,10 @@ import (
 
 type Broker struct {
 	Name           string  `json:"name"`
-	BasicPrice     float32 `json:"basic_price"`
-	CommissionRate float32 `json:"commission_rate"`
-	MinRate        float32 `json:"min_rate"`
-	MaxRate        float32 `json:"max_rate"`
+	BasicPrice     float64 `json:"basic_price"`
+	CommissionRate float64 `json:"commission_rate"`
+	MinRate        float64 `json:"min_rate"`
+	MaxRate        float64 `json:"max_rate"`
 }
 
 type Brokers map[string]Broker
@@ -20,7 +20,7 @@ type Brokers map[string]Broker
 type Order struct {
 	broker               string
 	volume               uint32
-	target, actual, stop float32
+	target, actual, stop float64
 }
 
 func BrokerRegister() (brokers Brokers) {
@@ -56,7 +56,7 @@ func GetBroker(shortName string) Broker {
 	return Broker{}
 }
 
-func StopLoss(actual, stop float32) float32 {
+func StopLoss(actual, stop float64) float64 {
 	if stop >= actual {
 		return actual
 	}
@@ -68,22 +68,22 @@ func New(o Order) Order {
 	return o
 }
 
-func RiskRewardRatio(o Order) float32 {
+func RiskRewardRatio(o Order) float64 {
 	chance := o.target - o.actual
 	risk := o.actual - o.stop
 	rrr := chance / risk
 
-	return float32(RoundDown(float64(rrr), 1))
+	return RoundDown(float64(rrr), 1)
 }
 
-func TotalCommission(o Order, shortName string) (commission float32) {
+func TotalCommission(o Order, shortName string) (commission float64) {
 	commission = 0.0
 
 	broker := GetBroker(shortName)
-	volumeRateBuy := float32(Amount(o)) * o.actual * broker.CommissionRate
-	volumeRateSell := float32(Amount(o)) * o.target * broker.CommissionRate
+	volumeRateBuy := float64(Amount(o)) * o.actual * broker.CommissionRate
+	volumeRateSell := float64(Amount(o)) * o.target * broker.CommissionRate
 
-	buySell := []float32{
+	buySell := []float64{
 		volumeRateBuy,
 		volumeRateSell,
 	}
@@ -99,38 +99,38 @@ func TotalCommission(o Order, shortName string) (commission float32) {
 			commission += broker.MinRate
 		}
 	}
-	commission = float32(RoundUp(float64(commission), 2))
+	commission = RoundUp(float64(commission), 2)
 
 	return
 }
 
 func Amount(o Order) uint32 {
-	amount := float32(o.volume) / o.actual
+	amount := float64(o.volume) / o.actual
 	amountRounded := RoundDown(float64(amount), 0)
 
 	return uint32(amountRounded)
 }
 
-func Gain(o Order, broker string) float32 {
+func Gain(o Order, broker string) float64 {
 	amount := Amount(o)
 	commission := TotalCommission(o, broker)
-	gain := (float32(amount) * o.target) - float32(o.volume) - commission
+	gain := (float64(amount) * o.target) - float64(o.volume) - commission
 
-	return float32(RoundUp(float64(gain), 2))
+	return RoundUp(float64(gain), 2)
 }
 
-func Loss(o Order, broker string) float32 {
+func Loss(o Order, broker string) float64 {
 	amount := Amount(o)
 	commission := TotalCommission(o, broker)
-	loss := float32(o.volume) - (float32(amount) * o.stop) + commission
+	loss := float64(o.volume) - (float64(amount) * o.stop) + commission
 
-	return float32(RoundUp(float64(loss), 2))
+	return RoundUp(float64(loss), 2)
 }
 
-func Even(o Order, broker string) float32 {
+func Even(o Order, broker string) float64 {
 	amount := Amount(o)
 	commission := TotalCommission(o, broker)
-	even := (float32(o.volume) + commission) / float32(amount)
+	even := (float64(o.volume) + commission) / float64(amount)
 
-	return float32(RoundUp(float64(even), 2))
+	return RoundUp(float64(even), 2)
 }

@@ -57,8 +57,8 @@ func TestRiskRewardRatio(t *testing.T) {
 	for _, n := range orderTests {
 		o := New(Order{n.broker, n.volume, n.target, n.actual, n.stop})
 		rrr := RiskRewardRatio(o)
-		if reflect.TypeOf(rrr).String() != "float32" {
-			t.Error("Not of type float32")
+		if reflect.TypeOf(rrr).String() != "float64" {
+			t.Error("Not of type float64")
 		}
 	}
 	t.Log(len(orderTests), "test cases")
