@@ -24,9 +24,9 @@ type Order struct {
 }
 
 func BrokerRegister() (brokers Brokers) {
-	file, e := ioutil.ReadFile("./broker.json")
-	if e != nil {
-		fmt.Printf("File error: %v\n", e)
+	file, err := ioutil.ReadFile("./broker.json")
+	if err != nil {
+		fmt.Printf("File error: %v\n", err)
 		os.Exit(1)
 	}
 	json.Unmarshal(file, &brokers)
