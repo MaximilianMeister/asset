@@ -23,37 +23,55 @@ type Order struct {
 	target, actual, stop float64
 }
 
-func BrokerRegister() (brokers Brokers) {
+func BrokerRegister() (brokers Brokers, err error) {
 	file, err := ioutil.ReadFile("./broker.json")
 	if err != nil {
 		fmt.Printf("File error: %v\n", err)
 		os.Exit(1)
 	}
-	json.Unmarshal(file, &brokers)
 
-	return
+	if err = json.Unmarshal(file, &brokers); err != nil {
+		return brokers, err
+	}
+
+	return brokers, nil
 }
 
-func IsBroker(brokerAlias string) bool {
-	for b := range BrokerRegister() {
+func IsBroker(brokerAlias string) (bool, error) {
+	register, err := BrokerRegister()
+	if err != nil {
+		return false, err
+	}
+
+	for b := range register {
 		if b == brokerAlias {
-			return true
+			return true, nil
 		}
 	}
-	return false
+
+	return false, nil
 }
 
-func FindBroker(brokerAlias string) Broker {
-	if IsBroker(brokerAlias) {
-		register := BrokerRegister()
+func FindBroker(brokerAlias string) (Broker, error) {
+	valid, err := IsBroker(brokerAlias)
+	if err != nil {
+		return Broker{}, err
+	}
+
+	if valid {
+		register, err := BrokerRegister()
+		if err != nil {
+			return Broker{}, err
+		}
+
 		for b := range register {
 			if b == brokerAlias {
-				return register[b]
+				return register[b], nil
 			}
 		}
 	}
 
-	return Broker{}
+	return Broker{}, nil
 }
 
 func StopLoss(actual, stop float64) (float64, error) {
@@ -72,10 +90,14 @@ func RiskRewardRatio(o Order) float64 {
 	return RoundDown(float64(rrr), 1)
 }
 
-func TotalCommission(o Order, brokerAlias string) (commission float64) {
+func TotalCommission(o Order, brokerAlias string) (commission float64, err error) {
 	commission = 0.0
 
-	broker := FindBroker(brokerAlias)
+	broker, err := FindBroker(brokerAlias)
+	if err != nil {
+		return commission, err
+	}
+
 	volumeRateBuy := float64(Amount(o)) * o.actual * broker.CommissionRate
 	volumeRateSell := float64(Amount(o)) * o.target * broker.CommissionRate
 
@@ -107,26 +129,41 @@ func Amount(o Order) uint32 {
 	return uint32(amountRounded)
 }
 
-func Gain(o Order, broker string) float64 {
+func Gain(o Order, broker string) (gain float64, err error) {
 	amount := Amount(o)
-	commission := TotalCommission(o, broker)
-	gain := (float64(amount) * o.target) - float64(o.volume) - commission
+	commission, err := TotalCommission(o, broker)
+	if err != nil {
+		return 0.0, err
+	}
 
-	return RoundUp(float64(gain), 2)
+	gain = (float64(amount) * o.target) - float64(o.volume) - commission
+	gain = RoundUp(float64(gain), 2)
+
+	return gain, nil
 }
 
-func Loss(o Order, broker string) float64 {
+func Loss(o Order, broker string) (loss float64, err error) {
 	amount := Amount(o)
-	commission := TotalCommission(o, broker)
-	loss := float64(o.volume) - (float64(amount) * o.stop) + commission
+	commission, err := TotalCommission(o, broker)
+	if err != nil {
+		return 0.0, err
+	}
 
-	return RoundUp(float64(loss), 2)
+	loss = float64(o.volume) - (float64(amount) * o.stop) + commission
+	loss = RoundUp(float64(loss), 2)
+
+	return loss, nil
 }
 
-func Even(o Order, broker string) float64 {
+func Even(o Order, broker string) (even float64, err error) {
 	amount := Amount(o)
-	commission := TotalCommission(o, broker)
-	even := (float64(o.volume) + commission) / float64(amount)
+	commission, err := TotalCommission(o, broker)
+	if err != nil {
+		return 0.0, err
+	}
 
-	return RoundUp(float64(even), 2)
+	even = (float64(o.volume) + commission) / float64(amount)
+	even = RoundUp(float64(even), 2)
+
+	return even, nil
 }

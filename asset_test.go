@@ -8,30 +8,36 @@ import (
 
 func TestStopLoss(t *testing.T) {
 	for _, n := range stopLossTests {
-		sl, err := StopLoss(n.actual, n.stop);
+		sl, err := StopLoss(n.actual, n.stop)
 		if err != nil && n.errExpected == false {
 			t.Error(err)
 		}
 		if sl != n.expected {
-			t.Error(fmt.Sprintf("%s should be %s", sl, n.expected))
+			t.Error(fmt.Sprintf("%f should be %f", sl, n.expected))
 		}
 	}
 	t.Log(len(stopLossTests), "test cases")
 }
 
 func TestBrokerRegister(t *testing.T) {
-	b := BrokerRegister()
+	b, err := BrokerRegister()
+	if err != nil {
+		t.Error(err)
+	}
 	if reflect.TypeOf(b).String() != "asset.Brokers" {
-		t.Error("Can't open Broker register")
+		t.Error(fmt.Sprintf("%s is not a Broker register", b))
 	}
 	t.Log("1 test cases")
 }
 
 func TestIsBroker(t *testing.T) {
 	for _, n := range isBrokerTests {
-		b := IsBroker(n.brokerAlias)
+		b, err := IsBroker(n.brokerAlias)
+		if err != nil {
+			t.Error(err)
+		}
 		if b != n.expected {
-			t.Error("Can't validate Broker")
+			t.Error(fmt.Sprintf("%t should be %t", b, n.expected))
 		}
 	}
 	t.Log(len(isBrokerTests), "test cases")
@@ -39,9 +45,12 @@ func TestIsBroker(t *testing.T) {
 
 func TestFindBroker(t *testing.T) {
 	for _, n := range findBrokerTests {
-		b := FindBroker(n.brokerAlias)
+		b, err := FindBroker(n.brokerAlias)
+		if err != nil {
+			t.Error(err)
+		}
 		if b != n.expected {
-			t.Error("Can't get Broker")
+			t.Error(fmt.Sprintf("%s should be %s", reflect.TypeOf(b).String(), n.expected))
 		}
 	}
 	t.Log(len(findBrokerTests), "test cases")
@@ -61,8 +70,8 @@ func TestRiskRewardRatio(t *testing.T) {
 	for _, n := range orderTests {
 		o := Order{n.brokerAlias, n.volume, n.target, n.actual, n.stop}
 		rrr := RiskRewardRatio(o)
-		if reflect.TypeOf(rrr).String() != "float64" {
-			t.Error("Not of type float64")
+		if rrr != n.rrr {
+			t.Error(fmt.Sprintf("%f should be %f", rrr, n.rrr))
 		}
 	}
 	t.Log(len(orderTests), "test cases")
@@ -71,9 +80,12 @@ func TestRiskRewardRatio(t *testing.T) {
 func TestTotalCommission(t *testing.T) {
 	for _, n := range orderTests {
 		o := Order{n.brokerAlias, n.volume, n.target, n.actual, n.stop}
-		totalCommission := TotalCommission(o, n.brokerAlias)
+		totalCommission, err := TotalCommission(o, n.brokerAlias)
+		if err != nil {
+			t.Error(err)
+		}
 		if totalCommission != n.commission {
-			t.Error("Failed to determine total commision")
+			t.Error(fmt.Sprintf("%f should be %f", totalCommission, n.commission))
 		}
 	}
 	t.Log(len(orderTests), "test cases")
@@ -82,8 +94,9 @@ func TestTotalCommission(t *testing.T) {
 func TestAmount(t *testing.T) {
 	for _, n := range orderTests {
 		o := Order{n.brokerAlias, n.volume, n.target, n.actual, n.stop}
-		if Amount(o) != n.amount {
-			t.Error("Failed to determine total amount")
+		amount := Amount(o)
+		if amount != n.amount {
+			t.Error(fmt.Sprintf("%d should be %d", amount, n.amount))
 		}
 	}
 	t.Log(len(orderTests), "test cases")
@@ -92,8 +105,12 @@ func TestAmount(t *testing.T) {
 func TestGain(t *testing.T) {
 	for _, n := range orderTests {
 		o := Order{n.brokerAlias, n.volume, n.target, n.actual, n.stop}
-		if Gain(o, n.brokerAlias) != n.gain {
-			t.Error("Failed to determine maximum gain")
+		gain, err := Gain(o, n.brokerAlias)
+		if err != nil {
+			t.Error(err)
+		}
+		if gain != n.gain {
+			t.Error(fmt.Sprintf("%f should be %f", gain, n.gain))
 		}
 	}
 	t.Log(len(orderTests), "test cases")
@@ -102,8 +119,12 @@ func TestGain(t *testing.T) {
 func TestLoss(t *testing.T) {
 	for _, n := range orderTests {
 		o := Order{n.brokerAlias, n.volume, n.target, n.actual, n.stop}
-		if Loss(o, n.brokerAlias) != n.loss {
-			t.Error("Failed to determine maximum loss")
+		loss, err := Loss(o, n.brokerAlias)
+		if err != nil {
+			t.Error(err)
+		}
+		if loss != n.loss {
+			t.Error(fmt.Sprintf("%f should be %f", loss, n.loss))
 		}
 	}
 	t.Log(len(orderTests), "test cases")
@@ -112,8 +133,12 @@ func TestLoss(t *testing.T) {
 func TestEven(t *testing.T) {
 	for _, n := range orderTests {
 		o := Order{n.brokerAlias, n.volume, n.target, n.actual, n.stop}
-		if Even(o, n.brokerAlias) != n.even {
-			t.Error("Failed to determine break even")
+		even, err := Even(o, n.brokerAlias)
+		if err != nil {
+			t.Error(err)
+		}
+		if even != n.even {
+			t.Error(fmt.Sprintf("%f should be %f", even, n.even))
 		}
 	}
 	t.Log(len(orderTests), "test cases")
