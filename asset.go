@@ -82,12 +82,12 @@ func StopLoss(actual, stop float64) (float64, error) {
 	return stop, nil
 }
 
-func RiskRewardRatio(o Order) float64 {
+func RiskRewardRatio(o Order) (rrr float64) {
 	chance := o.target - o.actual
 	risk := o.actual - o.stop
-	rrr := chance / risk
+	rrr = RoundDown(float64(chance/risk), 1)
 
-	return RoundDown(float64(rrr), 1)
+	return
 }
 
 func TotalCommission(o Order, brokerAlias string) (commission float64, err error) {
@@ -122,11 +122,11 @@ func TotalCommission(o Order, brokerAlias string) (commission float64, err error
 	return
 }
 
-func Amount(o Order) uint32 {
-	amount := float64(o.volume) / o.actual
-	amountRounded := RoundDown(float64(amount), 0)
+func Amount(o Order) (amount uint32) {
+	amountFloat := float64(o.volume) / o.actual
+	amount = uint32(RoundDown(float64(amountFloat), 0))
 
-	return uint32(amountRounded)
+	return
 }
 
 func Gain(o Order, broker string) (gain float64, err error) {
