@@ -98,7 +98,7 @@ func StopLoss(actual, stop float64) (float64, error) {
 	return stop, nil
 }
 
-// RiskRewwardRatio returns a risk reward ratio value for an order
+// RiskRewardRatio returns a risk reward ratio value for an order
 func (o *Order) RiskRewardRatio() (rrr decimal.Decimal) {
 	chance := o.target.Sub(o.actual)
 	risk := o.actual.Sub(o.stop)
