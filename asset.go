@@ -6,22 +6,24 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+
+	"github.com/shopspring/decimal"
 )
 
 type Broker struct {
-	Name           string  `json:"name"`
-	BasicPrice     float64 `json:"basic_price"`
-	CommissionRate float64 `json:"commission_rate"`
-	MinRate        float64 `json:"min_rate"`
-	MaxRate        float64 `json:"max_rate"`
+	Name           string          `json:"name"`
+	BasicPrice     decimal.Decimal `json:"basic_price"`
+	CommissionRate decimal.Decimal `json:"commission_rate"`
+	MinRate        decimal.Decimal `json:"min_rate"`
+	MaxRate        decimal.Decimal `json:"max_rate"`
 }
 
 type Brokers map[string]Broker
 
 type Order struct {
 	brokerAlias          string
-	volume               uint32
-	target, actual, stop float64
+	volume               int64
+	target, actual, stop decimal.Decimal
 }
 
 // returns a map of type Brokers which contains all static broker data
@@ -83,7 +85,8 @@ func FindBroker(brokerAlias string) (Broker, error) {
 	return Broker{}, nil
 }
 
-// returns a stop loss value for an order
+// returns a stop loss value for an order when it is valid
+// when invalid it returns an error along with the actual price
 func StopLoss(actual, stop float64) (float64, error) {
 	if stop >= actual {
 		return actual, &higherLowerError{stop, actual}
@@ -93,93 +96,97 @@ func StopLoss(actual, stop float64) (float64, error) {
 }
 
 // returns a risk reward ratio value for an order
-func (o *Order) RiskRewardRatio() (rrr float64) {
-	chance := o.target - o.actual
-	risk := o.actual - o.stop
-	rrr = RoundDown(float64(chance/risk), 1)
+func (o *Order) RiskRewardRatio() (rrr decimal.Decimal) {
+	chance := o.target.Sub(o.actual)
+	risk := o.actual.Sub(o.stop)
+	rrr = chance.Div(risk).Round(1)
 
 	return
 }
 
 // returns the total broker commission fee for an order
-func (o *Order) TotalCommission(brokerAlias string) (commission float64, err error) {
-	commission = 0.0
+func (o *Order) TotalCommission(brokerAlias string) (commission decimal.Decimal, err error) {
+	commission = decimal.NewFromFloat(0.0)
 
 	broker, err := FindBroker(brokerAlias)
 	if err != nil {
 		return commission, err
 	}
 
-	volumeRateBuy := float64(o.Amount()) * o.actual * broker.CommissionRate
-	volumeRateSell := float64(o.Amount()) * o.target * broker.CommissionRate
+	volumeRateBuy := decimal.New(o.Amount(), 0).Mul(o.actual).Mul(broker.CommissionRate)
+	volumeRateSell := decimal.New(o.Amount(), 0).Mul(o.target).Mul(broker.CommissionRate)
 
-	buySell := []float64{
+	buySell := []decimal.Decimal{
 		volumeRateBuy,
 		volumeRateSell,
 	}
 
 	for _, bs := range buySell {
-		if (bs + broker.BasicPrice) > broker.MinRate {
-			if (bs + broker.BasicPrice) > broker.MaxRate {
-				commission += broker.MaxRate
+		if (bs.Add(broker.BasicPrice)).Cmp(broker.MinRate) == 1 {
+			if (bs.Add(broker.BasicPrice)).Cmp(broker.MaxRate) == 1 {
+				commission = commission.Add(broker.MaxRate)
 			} else {
-				commission += (broker.BasicPrice + bs)
+				commission = commission.Add(broker.BasicPrice.Add(bs))
 			}
 		} else {
-			commission += broker.MinRate
+			commission = commission.Add(broker.MinRate)
 		}
 	}
-	commission = RoundUp(float64(commission), 2)
+	commission = commission.Round(2)
 
 	return
 }
 
 // returns the actual amount of stocks that can be bought for an order
-func (o *Order) Amount() (amount uint32) {
-	amountFloat := float64(o.volume) / o.actual
-	amount = uint32(RoundDown(float64(amountFloat), 0))
+func (o *Order) Amount() (amount int64) {
+	amount = decimal.New(o.volume, 0).Div(o.actual).Round(0).IntPart()
 
 	return
 }
 
 // returns the highest possible gain for an order
-func (o *Order) Gain(broker string) (gain float64, err error) {
-	amount := o.Amount()
+func (o *Order) Gain(broker string) (gain decimal.Decimal, err error) {
+	amount := decimal.New(o.Amount(), 0)
+	volume := decimal.New(o.volume, 0)
 	commission, err := o.TotalCommission(broker)
 	if err != nil {
-		return 0.0, err
+		return decimal.NewFromFloat(0.0), err
 	}
 
-	gain = (float64(amount) * o.target) - float64(o.volume) - commission
-	gain = RoundUp(float64(gain), 2)
+	gain = amount.Mul(o.target)
+	gain = gain.Sub(volume).Sub(commission)
+	gain = gain.Round(2)
 
 	return gain, nil
 }
 
 // returns the highest possible loss for an order
-func (o *Order) Loss(broker string) (loss float64, err error) {
-	amount := o.Amount()
+func (o *Order) Loss(broker string) (loss decimal.Decimal, err error) {
+	amount := decimal.New(o.Amount(), 0)
+	volume := decimal.New(o.volume, 0)
 	commission, err := o.TotalCommission(broker)
 	if err != nil {
-		return 0.0, err
+		return decimal.NewFromFloat(0.0), err
 	}
 
-	loss = float64(o.volume) - (float64(amount) * o.stop) + commission
-	loss = RoundUp(float64(loss), 2)
+	loss = volume.Sub(amount.Mul(o.stop)).Add(commission)
+	loss = loss.Round(2)
 
 	return loss, nil
 }
 
 // returns the exact break even point for an order
-func (o *Order) Even(broker string) (even float64, err error) {
-	amount := o.Amount()
+func (o *Order) Even(broker string) (even decimal.Decimal, err error) {
+	amount := decimal.New(o.Amount(), 0)
+	volume := decimal.New(o.volume, 0)
 	commission, err := o.TotalCommission(broker)
 	if err != nil {
-		return 0.0, err
+		return decimal.NewFromFloat(0.0), err
 	}
 
-	even = (float64(o.volume) + commission) / float64(amount)
-	even = RoundUp(float64(even), 2)
+	even = volume.Add(commission)
+	even = even.Div(amount)
+	even = even.Round(2)
 
 	return even, nil
 }

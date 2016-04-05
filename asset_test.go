@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"reflect"
 	"testing"
+
+	"github.com/shopspring/decimal"
 )
 
 func TestStopLoss(t *testing.T) {
@@ -44,13 +46,29 @@ func TestIsBroker(t *testing.T) {
 }
 
 func TestFindBroker(t *testing.T) {
+	success := true
 	for _, n := range findBrokerTests {
 		b, err := FindBroker(n.brokerAlias)
 		if err != nil {
 			t.Error(err)
 		}
-		if b != n.expected {
-			t.Error(fmt.Sprintf("%s should be %s", reflect.TypeOf(b).String(), n.expected))
+		if b.Name != n.expected.Name {
+			success = false
+		}
+		if !b.BasicPrice.Equals(n.expected.BasicPrice) {
+			success = false
+		}
+		if !b.CommissionRate.Equals(n.expected.CommissionRate) {
+			success = false
+		}
+		if !b.MinRate.Equals(n.expected.MinRate) {
+			success = false
+		}
+		if !b.MaxRate.Equals(n.expected.MaxRate) {
+			success = false
+		}
+		if !success {
+			t.Error(fmt.Sprintf("%s should be %s", b, n.expected))
 		}
 	}
 	t.Log(len(findBrokerTests), "test cases")
@@ -58,7 +76,13 @@ func TestFindBroker(t *testing.T) {
 
 func TestCreateOrder(t *testing.T) {
 	for _, n := range orderTests {
-		o := Order{n.brokerAlias, n.volume, n.target, n.actual, n.stop}
+		o := Order{
+			n.brokerAlias,
+			n.volume,
+			decimal.NewFromFloat(n.target),
+			decimal.NewFromFloat(n.actual),
+			decimal.NewFromFloat(n.stop),
+		}
 		if reflect.TypeOf(o).String() != "asset.Order" {
 			t.Error("Not of type Order")
 		}
@@ -68,10 +92,16 @@ func TestCreateOrder(t *testing.T) {
 
 func TestRiskRewardRatio(t *testing.T) {
 	for _, n := range orderTests {
-		o := Order{n.brokerAlias, n.volume, n.target, n.actual, n.stop}
+		o := Order{
+			n.brokerAlias,
+			n.volume,
+			decimal.NewFromFloat(n.target),
+			decimal.NewFromFloat(n.actual),
+			decimal.NewFromFloat(n.stop),
+		}
 		rrr := o.RiskRewardRatio()
-		if rrr != n.rrr {
-			t.Error(fmt.Sprintf("%f should be %f", rrr, n.rrr))
+		if !rrr.Equals(n.rrr) {
+			t.Error(fmt.Sprintf("%v should be %v", rrr, n.rrr))
 		}
 	}
 	t.Log(len(orderTests), "test cases")
@@ -79,13 +109,19 @@ func TestRiskRewardRatio(t *testing.T) {
 
 func TestTotalCommission(t *testing.T) {
 	for _, n := range orderTests {
-		o := Order{n.brokerAlias, n.volume, n.target, n.actual, n.stop}
+		o := Order{
+			n.brokerAlias,
+			n.volume,
+			decimal.NewFromFloat(n.target),
+			decimal.NewFromFloat(n.actual),
+			decimal.NewFromFloat(n.stop),
+		}
 		totalCommission, err := o.TotalCommission(n.brokerAlias)
 		if err != nil {
 			t.Error(err)
 		}
-		if totalCommission != n.commission {
-			t.Error(fmt.Sprintf("%f should be %f", totalCommission, n.commission))
+		if !totalCommission.Equals(decimal.NewFromFloat(n.commission)) {
+			t.Error(fmt.Sprintf("%v should be %v", totalCommission, n.commission))
 		}
 	}
 	t.Log(len(orderTests), "test cases")
@@ -93,7 +129,13 @@ func TestTotalCommission(t *testing.T) {
 
 func TestAmount(t *testing.T) {
 	for _, n := range orderTests {
-		o := Order{n.brokerAlias, n.volume, n.target, n.actual, n.stop}
+		o := Order{
+			n.brokerAlias,
+			n.volume,
+			decimal.NewFromFloat(n.target),
+			decimal.NewFromFloat(n.actual),
+			decimal.NewFromFloat(n.stop),
+		}
 		amount := o.Amount()
 		if amount != n.amount {
 			t.Error(fmt.Sprintf("%d should be %d", amount, n.amount))
@@ -104,13 +146,19 @@ func TestAmount(t *testing.T) {
 
 func TestGain(t *testing.T) {
 	for _, n := range orderTests {
-		o := Order{n.brokerAlias, n.volume, n.target, n.actual, n.stop}
+		o := Order{
+			n.brokerAlias,
+			n.volume,
+			decimal.NewFromFloat(n.target),
+			decimal.NewFromFloat(n.actual),
+			decimal.NewFromFloat(n.stop),
+		}
 		gain, err := o.Gain(n.brokerAlias)
 		if err != nil {
 			t.Error(err)
 		}
-		if gain != n.gain {
-			t.Error(fmt.Sprintf("%f should be %f", gain, n.gain))
+		if !gain.Equals(decimal.NewFromFloat(n.gain)) {
+			t.Error(fmt.Sprintf("%v should be %v", gain, n.gain))
 		}
 	}
 	t.Log(len(orderTests), "test cases")
@@ -118,13 +166,19 @@ func TestGain(t *testing.T) {
 
 func TestLoss(t *testing.T) {
 	for _, n := range orderTests {
-		o := Order{n.brokerAlias, n.volume, n.target, n.actual, n.stop}
+		o := Order{
+			n.brokerAlias,
+			n.volume,
+			decimal.NewFromFloat(n.target),
+			decimal.NewFromFloat(n.actual),
+			decimal.NewFromFloat(n.stop),
+		}
 		loss, err := o.Loss(n.brokerAlias)
 		if err != nil {
 			t.Error(err)
 		}
-		if loss != n.loss {
-			t.Error(fmt.Sprintf("%f should be %f", loss, n.loss))
+		if !loss.Equals(decimal.NewFromFloat(n.loss)) {
+			t.Error(fmt.Sprintf("%v should be %v", loss, n.loss))
 		}
 	}
 	t.Log(len(orderTests), "test cases")
@@ -132,13 +186,19 @@ func TestLoss(t *testing.T) {
 
 func TestEven(t *testing.T) {
 	for _, n := range orderTests {
-		o := Order{n.brokerAlias, n.volume, n.target, n.actual, n.stop}
+		o := Order{
+			n.brokerAlias,
+			n.volume,
+			decimal.NewFromFloat(n.target),
+			decimal.NewFromFloat(n.actual),
+			decimal.NewFromFloat(n.stop),
+		}
 		even, err := o.Even(n.brokerAlias)
 		if err != nil {
 			t.Error(err)
 		}
-		if even != n.even {
-			t.Error(fmt.Sprintf("%f should be %f", even, n.even))
+		if !even.Equals(decimal.NewFromFloat(n.even)) {
+			t.Error(fmt.Sprintf("%v should be %v", even, n.even))
 		}
 	}
 	t.Log(len(orderTests), "test cases")
