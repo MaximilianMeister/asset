@@ -1,7 +1,6 @@
 package asset
 
 import (
-	"fmt"
 	"reflect"
 	"testing"
 
@@ -15,7 +14,7 @@ func TestStopLoss(t *testing.T) {
 			t.Error(err)
 		}
 		if sl != n.expected {
-			t.Error(fmt.Sprintf("%f should be %f", sl, n.expected))
+			t.Errorf("%f should be %f", sl, n.expected)
 		}
 	}
 	t.Log(len(stopLossTests), "test cases")
@@ -27,7 +26,7 @@ func TestBrokerRegister(t *testing.T) {
 		t.Error(err)
 	}
 	if reflect.TypeOf(b).String() != "asset.Brokers" {
-		t.Error(fmt.Sprintf("%s is not a Broker register", b))
+		t.Errorf("%s is not a Broker register", b)
 	}
 	t.Log("1 test cases")
 }
@@ -39,7 +38,7 @@ func TestIsBroker(t *testing.T) {
 			t.Error(err)
 		}
 		if b != n.expected {
-			t.Error(fmt.Sprintf("%t should be %t", b, n.expected))
+			t.Errorf("%t should be %t", b, n.expected)
 		}
 	}
 	t.Log(len(isBrokerTests), "test cases")
@@ -68,7 +67,7 @@ func TestFindBroker(t *testing.T) {
 			success = false
 		}
 		if !success {
-			t.Error(fmt.Sprintf("%s should be %s", b, n.expected))
+			t.Errorf("%s should be %s", b, n.expected)
 		}
 	}
 	t.Log(len(findBrokerTests), "test cases")
@@ -101,7 +100,7 @@ func TestRiskRewardRatio(t *testing.T) {
 		}
 		rrr := o.RiskRewardRatio()
 		if !rrr.Equals(n.rrr) {
-			t.Error(fmt.Sprintf("%v should be %v", rrr, n.rrr))
+			t.Errorf("%v should be %v", rrr, n.rrr)
 		}
 	}
 	t.Log(len(orderTests), "test cases")
@@ -121,7 +120,7 @@ func TestTotalCommission(t *testing.T) {
 			t.Error(err)
 		}
 		if !totalCommission.Equals(decimal.NewFromFloat(n.commission)) {
-			t.Error(fmt.Sprintf("%v should be %v", totalCommission, n.commission))
+			t.Errorf("%v should be %v", totalCommission, n.commission)
 		}
 	}
 	t.Log(len(orderTests), "test cases")
@@ -138,7 +137,7 @@ func TestAmount(t *testing.T) {
 		}
 		amount := o.Amount()
 		if amount != n.amount {
-			t.Error(fmt.Sprintf("%d should be %d", amount, n.amount))
+			t.Errorf("%d should be %d", amount, n.amount)
 		}
 	}
 	t.Log(len(orderTests), "test cases")
@@ -158,7 +157,7 @@ func TestGain(t *testing.T) {
 			t.Error(err)
 		}
 		if !gain.Equals(decimal.NewFromFloat(n.gain)) {
-			t.Error(fmt.Sprintf("%v should be %v", gain, n.gain))
+			t.Errorf("%v should be %v", gain, n.gain)
 		}
 	}
 	t.Log(len(orderTests), "test cases")
@@ -178,7 +177,7 @@ func TestLoss(t *testing.T) {
 			t.Error(err)
 		}
 		if !loss.Equals(decimal.NewFromFloat(n.loss)) {
-			t.Error(fmt.Sprintf("%v should be %v", loss, n.loss))
+			t.Errorf("%v should be %v", loss, n.loss)
 		}
 	}
 	t.Log(len(orderTests), "test cases")
@@ -198,7 +197,7 @@ func TestEven(t *testing.T) {
 			t.Error(err)
 		}
 		if !even.Equals(decimal.NewFromFloat(n.even)) {
-			t.Error(fmt.Sprintf("%v should be %v", even, n.even))
+			t.Errorf("%v should be %v", even, n.even)
 		}
 	}
 	t.Log(len(orderTests), "test cases")

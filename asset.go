@@ -1,4 +1,4 @@
-// package asset provides an api to calculate asset price projections.
+// Package asset provides an api to calculate asset price projections.
 package asset
 
 import (
@@ -10,6 +10,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+// static broker data
 type Broker struct {
 	Name           string          `json:"name"`
 	BasicPrice     decimal.Decimal `json:"basic_price"`
@@ -18,8 +19,10 @@ type Broker struct {
 	MaxRate        decimal.Decimal `json:"max_rate"`
 }
 
+// map of all brokers and their static data
 type Brokers map[string]Broker
 
+// data to calculate order figures
 type Order struct {
 	brokerAlias          string
 	volume               int64
@@ -46,7 +49,7 @@ func BrokerRegister() (brokers Brokers, err error) {
 	return brokers, nil
 }
 
-// returns bool if broker is available
+// IsBroker returns bool if broker is available
 func IsBroker(brokerAlias string) (bool, error) {
 	register, err := BrokerRegister()
 	if err != nil {
@@ -62,7 +65,7 @@ func IsBroker(brokerAlias string) (bool, error) {
 	return false, nil
 }
 
-// returns a Broker type with all static data about a single broker
+// FindBroker returns a Broker type with all static data about a single broker
 func FindBroker(brokerAlias string) (Broker, error) {
 	valid, err := IsBroker(brokerAlias)
 	if err != nil {
@@ -85,7 +88,7 @@ func FindBroker(brokerAlias string) (Broker, error) {
 	return Broker{}, nil
 }
 
-// returns a stop loss value for an order when it is valid
+// StopLoss returns a stop loss value for an order when it is valid.
 // when invalid it returns an error along with the actual price
 func StopLoss(actual, stop float64) (float64, error) {
 	if stop >= actual {
@@ -95,7 +98,7 @@ func StopLoss(actual, stop float64) (float64, error) {
 	return stop, nil
 }
 
-// returns a risk reward ratio value for an order
+// RiskRewwardRatio returns a risk reward ratio value for an order
 func (o *Order) RiskRewardRatio() (rrr decimal.Decimal) {
 	chance := o.target.Sub(o.actual)
 	risk := o.actual.Sub(o.stop)
@@ -104,7 +107,7 @@ func (o *Order) RiskRewardRatio() (rrr decimal.Decimal) {
 	return
 }
 
-// returns the total broker commission fee for an order
+// TotalCommission returns the total broker commission fee for an order
 func (o *Order) TotalCommission(brokerAlias string) (commission decimal.Decimal, err error) {
 	commission = decimal.NewFromFloat(0.0)
 
@@ -137,14 +140,14 @@ func (o *Order) TotalCommission(brokerAlias string) (commission decimal.Decimal,
 	return
 }
 
-// returns the actual amount of stocks that can be bought for an order
+// Amount returns the actual amount of stocks that can be bought for an order
 func (o *Order) Amount() (amount int64) {
 	amount = decimal.New(o.volume, 0).Div(o.actual).Round(0).IntPart()
 
 	return
 }
 
-// returns the highest possible gain for an order
+// Gain returns the highest possible gain for an order
 func (o *Order) Gain(broker string) (gain decimal.Decimal, err error) {
 	amount := decimal.New(o.Amount(), 0)
 	volume := decimal.New(o.volume, 0)
@@ -160,7 +163,7 @@ func (o *Order) Gain(broker string) (gain decimal.Decimal, err error) {
 	return gain, nil
 }
 
-// returns the highest possible loss for an order
+// Loss returns the highest possible loss for an order
 func (o *Order) Loss(broker string) (loss decimal.Decimal, err error) {
 	amount := decimal.New(o.Amount(), 0)
 	volume := decimal.New(o.volume, 0)
@@ -175,7 +178,7 @@ func (o *Order) Loss(broker string) (loss decimal.Decimal, err error) {
 	return loss, nil
 }
 
-// returns the exact break even point for an order
+// Even returns the exact break even point for an order
 func (o *Order) Even(broker string) (even decimal.Decimal, err error) {
 	amount := decimal.New(o.Amount(), 0)
 	volume := decimal.New(o.volume, 0)
