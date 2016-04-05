@@ -16,3 +16,7 @@ It yields figures based on asset price expectations.
 * maximum loss
 * break even
 * total commission rates of a specific broker
+
+## Documentation
+
+Documentation can be found on [godoc.org/github.com/MaximilianMeister/asset](https://godoc.org/github.com/MaximilianMeister/asset)
