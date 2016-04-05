@@ -69,7 +69,7 @@ func TestCreateOrder(t *testing.T) {
 func TestRiskRewardRatio(t *testing.T) {
 	for _, n := range orderTests {
 		o := Order{n.brokerAlias, n.volume, n.target, n.actual, n.stop}
-		rrr := RiskRewardRatio(o)
+		rrr := o.RiskRewardRatio()
 		if rrr != n.rrr {
 			t.Error(fmt.Sprintf("%f should be %f", rrr, n.rrr))
 		}
@@ -80,7 +80,7 @@ func TestRiskRewardRatio(t *testing.T) {
 func TestTotalCommission(t *testing.T) {
 	for _, n := range orderTests {
 		o := Order{n.brokerAlias, n.volume, n.target, n.actual, n.stop}
-		totalCommission, err := TotalCommission(o, n.brokerAlias)
+		totalCommission, err := o.TotalCommission(n.brokerAlias)
 		if err != nil {
 			t.Error(err)
 		}
@@ -94,7 +94,7 @@ func TestTotalCommission(t *testing.T) {
 func TestAmount(t *testing.T) {
 	for _, n := range orderTests {
 		o := Order{n.brokerAlias, n.volume, n.target, n.actual, n.stop}
-		amount := Amount(o)
+		amount := o.Amount()
 		if amount != n.amount {
 			t.Error(fmt.Sprintf("%d should be %d", amount, n.amount))
 		}
@@ -105,7 +105,7 @@ func TestAmount(t *testing.T) {
 func TestGain(t *testing.T) {
 	for _, n := range orderTests {
 		o := Order{n.brokerAlias, n.volume, n.target, n.actual, n.stop}
-		gain, err := Gain(o, n.brokerAlias)
+		gain, err := o.Gain(n.brokerAlias)
 		if err != nil {
 			t.Error(err)
 		}
@@ -119,7 +119,7 @@ func TestGain(t *testing.T) {
 func TestLoss(t *testing.T) {
 	for _, n := range orderTests {
 		o := Order{n.brokerAlias, n.volume, n.target, n.actual, n.stop}
-		loss, err := Loss(o, n.brokerAlias)
+		loss, err := o.Loss(n.brokerAlias)
 		if err != nil {
 			t.Error(err)
 		}
@@ -133,7 +133,7 @@ func TestLoss(t *testing.T) {
 func TestEven(t *testing.T) {
 	for _, n := range orderTests {
 		o := Order{n.brokerAlias, n.volume, n.target, n.actual, n.stop}
-		even, err := Even(o, n.brokerAlias)
+		even, err := o.Even(n.brokerAlias)
 		if err != nil {
 			t.Error(err)
 		}

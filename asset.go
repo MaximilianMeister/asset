@@ -93,7 +93,7 @@ func StopLoss(actual, stop float64) (float64, error) {
 }
 
 // returns a risk reward ratio value for an order
-func RiskRewardRatio(o Order) (rrr float64) {
+func (o *Order) RiskRewardRatio() (rrr float64) {
 	chance := o.target - o.actual
 	risk := o.actual - o.stop
 	rrr = RoundDown(float64(chance/risk), 1)
@@ -102,7 +102,7 @@ func RiskRewardRatio(o Order) (rrr float64) {
 }
 
 // returns the total broker commission fee for an order
-func TotalCommission(o Order, brokerAlias string) (commission float64, err error) {
+func (o *Order) TotalCommission(brokerAlias string) (commission float64, err error) {
 	commission = 0.0
 
 	broker, err := FindBroker(brokerAlias)
@@ -110,8 +110,8 @@ func TotalCommission(o Order, brokerAlias string) (commission float64, err error
 		return commission, err
 	}
 
-	volumeRateBuy := float64(Amount(o)) * o.actual * broker.CommissionRate
-	volumeRateSell := float64(Amount(o)) * o.target * broker.CommissionRate
+	volumeRateBuy := float64(o.Amount()) * o.actual * broker.CommissionRate
+	volumeRateSell := float64(o.Amount()) * o.target * broker.CommissionRate
 
 	buySell := []float64{
 		volumeRateBuy,
@@ -135,7 +135,7 @@ func TotalCommission(o Order, brokerAlias string) (commission float64, err error
 }
 
 // returns the actual amount of stocks that can be bought for an order
-func Amount(o Order) (amount uint32) {
+func (o *Order) Amount() (amount uint32) {
 	amountFloat := float64(o.volume) / o.actual
 	amount = uint32(RoundDown(float64(amountFloat), 0))
 
@@ -143,9 +143,9 @@ func Amount(o Order) (amount uint32) {
 }
 
 // returns the highest possible gain for an order
-func Gain(o Order, broker string) (gain float64, err error) {
-	amount := Amount(o)
-	commission, err := TotalCommission(o, broker)
+func (o *Order) Gain(broker string) (gain float64, err error) {
+	amount := o.Amount()
+	commission, err := o.TotalCommission(broker)
 	if err != nil {
 		return 0.0, err
 	}
@@ -157,9 +157,9 @@ func Gain(o Order, broker string) (gain float64, err error) {
 }
 
 // returns the highest possible loss for an order
-func Loss(o Order, broker string) (loss float64, err error) {
-	amount := Amount(o)
-	commission, err := TotalCommission(o, broker)
+func (o *Order) Loss(broker string) (loss float64, err error) {
+	amount := o.Amount()
+	commission, err := o.TotalCommission(broker)
 	if err != nil {
 		return 0.0, err
 	}
@@ -171,9 +171,9 @@ func Loss(o Order, broker string) (loss float64, err error) {
 }
 
 // returns the exact break even point for an order
-func Even(o Order, broker string) (even float64, err error) {
-	amount := Amount(o)
-	commission, err := TotalCommission(o, broker)
+func (o *Order) Even(broker string) (even float64, err error) {
+	amount := o.Amount()
+	commission, err := o.TotalCommission(broker)
 	if err != nil {
 		return 0.0, err
 	}
