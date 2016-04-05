@@ -14,6 +14,3 @@ It yields figures based on asset price expectations.
 * maximum loss
 * break even
 * total commission rates of a specific broker
-
-#### TODO
-integrate https://github.com/shopspring/decimal for all floats
