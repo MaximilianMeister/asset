@@ -1,13 +1,15 @@
-![Build Status](https://travis-ci.org/MaximilianMeister/asset.png?branch=master) ![Go Report Card](http://goreportcard.com/badge/MaximilianMeister/asset) ![Go Cover](https://gocover.io/_badge/github.com/MaximilianMeister/asset)
+![Build Status](https://travis-ci.org/MaximilianMeister/asset.png?branch=master) ![Go Report Card](http://goreportcard.com/badge/MaximilianMeister/asset)
+
+* `broker` ![Go Cover](https://gocover.io/_badge/github.com/MaximilianMeister/asset/broker)
+* `order` ![Go Cover](https://gocover.io/_badge/github.com/MaximilianMeister/asset/order)
 
 # asset
 
-a go library to calculate asset price projections
+Package asset is a set of packages for calculating and evaluating financial asset figures.
 
-this library can be used to calculate price figures of any
-kind of order on the stock market or OTC.
+The `broker` package allows to get static broker data to calculate order prices and fees.
 
-It yields figures based on asset price expectations.
+The `order` package allows to calculate future price projections, broker fees and risk figures.
 
 ### features
 

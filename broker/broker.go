@@ -1,3 +1,5 @@
+// Package broker allows to get static data of a list of brokers defined in the brokers.json file.
+// This data can be used e.g. to calculate order prices with github.com/MaximilianMeister/asset/order
 package broker
 
 import (

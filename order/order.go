@@ -1,3 +1,4 @@
+// Package order allows to calculate future price projections, broker fees and risk figures
 package order
 
 import (
