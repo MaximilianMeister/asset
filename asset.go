@@ -22,13 +22,6 @@ type Broker struct {
 // Brokers represents a map of all brokers and their static data
 type Brokers map[string]Broker
 
-// Order contains data to calculate order figures
-type Order struct {
-	brokerAlias          string
-	volume               int64
-	target, actual, stop decimal.Decimal
-}
-
 // BrokerRegister returns a map of type Brokers which contains all static broker data
 // defined in brokers.json
 func BrokerRegister() (brokers Brokers, err error) {
@@ -84,6 +77,13 @@ func FindBroker(brokerAlias string) (Broker, error) {
 	}
 
 	return Broker{}, nil
+}
+
+// Order contains data to calculate order figures
+type Order struct {
+	brokerAlias          string
+	volume               int64
+	target, actual, stop decimal.Decimal
 }
 
 // RiskRewardRatio returns a risk reward ratio value for an order
