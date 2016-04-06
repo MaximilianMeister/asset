@@ -8,7 +8,7 @@ go:
 
 install:
   - go get github.com/shopspring/decimal
-  - go build .
+  - for i in $(ls -d */); do pushd $i 2>&1 >/dev/null; go build .; popd 2>&1 >/dev/null; done
 
 script:
   - for i in $(ls -d */); do pushd $i 2>&1 >/dev/null; go test -cover; popd 2>&1 >/dev/null; done
