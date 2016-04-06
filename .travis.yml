@@ -9,4 +9,4 @@ install:
   - go build .
 
 script:
-  - go test -cover -v ./...
+  - for i in $(ls -d */); do pushd $i 2>&1 >/dev/null; go test -cover; popd 2>&1 >/dev/null; done
