@@ -10,7 +10,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-// static broker data
+// Broker contains static broker data
 type Broker struct {
 	Name           string          `json:"name"`
 	BasicPrice     decimal.Decimal `json:"basic_price"`
@@ -19,17 +19,17 @@ type Broker struct {
 	MaxRate        decimal.Decimal `json:"max_rate"`
 }
 
-// map of all brokers and their static data
+// Brokers represents a map of all brokers and their static data
 type Brokers map[string]Broker
 
-// data to calculate order figures
+// Order contains data to calculate order figures
 type Order struct {
 	brokerAlias          string
 	volume               int64
 	target, actual, stop decimal.Decimal
 }
 
-// returns a map of type Brokers which contains all static broker data
+// BrokerRegister returns a map of type Brokers which contains all static broker data
 // defined in brokers.json
 func BrokerRegister() (brokers Brokers, err error) {
 	// please note that the static data can be outdated and does not contain all
@@ -50,52 +50,40 @@ func BrokerRegister() (brokers Brokers, err error) {
 }
 
 // IsBroker returns bool if broker is available
-func IsBroker(brokerAlias string) (bool, error) {
+func IsBroker(brokerAlias string) error {
 	register, err := BrokerRegister()
 	if err != nil {
-		return false, err
+		return err
 	}
 
 	for b := range register {
 		if b == brokerAlias {
-			return true, nil
+			return nil
 		}
 	}
 
-	return false, nil
+	return &InvalidBrokerError{brokerAlias}
 }
 
 // FindBroker returns a Broker type with all static data about a single broker
 func FindBroker(brokerAlias string) (Broker, error) {
-	valid, err := IsBroker(brokerAlias)
+	err := IsBroker(brokerAlias)
 	if err != nil {
 		return Broker{}, err
 	}
 
-	if valid {
-		register, err := BrokerRegister()
-		if err != nil {
-			return Broker{}, err
-		}
+	register, err := BrokerRegister()
+	if err != nil {
+		return Broker{}, err
+	}
 
-		for b := range register {
-			if b == brokerAlias {
-				return register[b], nil
-			}
+	for b := range register {
+		if b == brokerAlias {
+			return register[b], nil
 		}
 	}
 
 	return Broker{}, nil
-}
-
-// StopLoss returns a stop loss value for an order when it is valid.
-// when invalid it returns an error along with the actual price
-func StopLoss(actual, stop float64) (float64, error) {
-	if stop >= actual {
-		return actual, &higherLowerError{stop, actual}
-	}
-
-	return stop, nil
 }
 
 // RiskRewardRatio returns a risk reward ratio value for an order
@@ -192,4 +180,13 @@ func (o *Order) Even(broker string) (even decimal.Decimal, err error) {
 	even = even.Round(2)
 
 	return even, nil
+}
+
+// StopLoss returns nil when it is valid.
+func StopLoss(actual, stop float64) error {
+	if stop >= actual {
+		return &HigherLowerError{stop, actual}
+	}
+
+	return nil
 }

@@ -4,201 +4,208 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/franela/goblin"
 	"github.com/shopspring/decimal"
 )
 
-func TestStopLoss(t *testing.T) {
-	for _, n := range stopLossTests {
-		sl, err := StopLoss(n.actual, n.stop)
-		if err != nil && n.errExpected == false {
-			t.Error(err)
-		}
-		if sl != n.expected {
-			t.Errorf("%f should be %f", sl, n.expected)
-		}
-	}
-	t.Log(len(stopLossTests), "test cases")
-}
-
 func TestBrokerRegister(t *testing.T) {
-	b, err := BrokerRegister()
-	if err != nil {
-		t.Error(err)
-	}
-	if reflect.TypeOf(b).String() != "asset.Brokers" {
-		t.Errorf("%s is not a Broker register", b)
-	}
-	t.Log("1 test cases")
+	g := goblin.Goblin(t)
+	g.Describe("Broker Register", func() {
+		b, err := BrokerRegister()
+		for i, n := range brokerRegisterTests {
+			g.It("Should Return A Map Of Brokers", func() {
+				g.Assert(err == nil).IsTrue()
+				g.Assert(b[i] == n)
+				g.Assert(b[i].BasicPrice == n.BasicPrice)
+				g.Assert(b[i].CommissionRate == n.CommissionRate)
+				g.Assert(b[i].MinRate == n.MinRate)
+				g.Assert(b[i].MaxRate == n.MaxRate)
+			})
+		}
+	})
 }
 
 func TestIsBroker(t *testing.T) {
-	for _, n := range isBrokerTests {
-		b, err := IsBroker(n.brokerAlias)
-		if err != nil {
-			t.Error(err)
+	g := goblin.Goblin(t)
+	g.Describe("Is Broker", func() {
+		for _, n := range isBrokerTests {
+			g.It("Should Be A Broker", func() {
+				err := IsBroker(n.brokerAlias)
+				if n.errExpected == true {
+					g.Assert(err == nil).IsFalse()
+				} else {
+					g.Assert(err == nil).IsTrue()
+				}
+			})
 		}
-		if b != n.expected {
-			t.Errorf("%t should be %t", b, n.expected)
-		}
-	}
-	t.Log(len(isBrokerTests), "test cases")
+	})
 }
 
 func TestFindBroker(t *testing.T) {
-	success := true
-	for _, n := range findBrokerTests {
-		b, err := FindBroker(n.brokerAlias)
-		if err != nil {
-			t.Error(err)
-		}
-		if b.Name != n.expected.Name {
-			success = false
-		}
-		if !b.BasicPrice.Equals(n.expected.BasicPrice) {
-			success = false
-		}
-		if !b.CommissionRate.Equals(n.expected.CommissionRate) {
-			success = false
-		}
-		if !b.MinRate.Equals(n.expected.MinRate) {
-			success = false
-		}
-		if !b.MaxRate.Equals(n.expected.MaxRate) {
-			success = false
-		}
-		if !success {
-			t.Errorf("%s should be %s", b, n.expected)
-		}
-	}
-	t.Log(len(findBrokerTests), "test cases")
+	g := goblin.Goblin(t)
+	g.Describe("Find Broker", func() {
+		g.It("Should Find A Broker", func() {
+			for _, n := range findBrokerTests {
+				b, err := FindBroker(n.brokerAlias)
+				g.Assert(err == nil).IsTrue()
+				g.Assert(b.Name == n.expected.Name)
+				g.Assert(b.BasicPrice == n.expected.BasicPrice)
+				g.Assert(b.CommissionRate == n.expected.CommissionRate)
+				g.Assert(b.MinRate == n.expected.MinRate)
+				g.Assert(b.MaxRate == n.expected.MaxRate)
+			}
+		})
+	})
 }
 
 func TestCreateOrder(t *testing.T) {
-	for _, n := range orderTests {
-		o := Order{
-			n.brokerAlias,
-			n.volume,
-			decimal.NewFromFloat(n.target),
-			decimal.NewFromFloat(n.actual),
-			decimal.NewFromFloat(n.stop),
-		}
-		if reflect.TypeOf(o).String() != "asset.Order" {
-			t.Error("Not of type Order")
-		}
-	}
-	t.Log(len(orderTests), "test cases")
+	g := goblin.Goblin(t)
+	g.Describe("Create Order", func() {
+		g.It("Should Create An Order", func() {
+			for _, n := range orderTests {
+				o := Order{
+					n.brokerAlias,
+					n.volume,
+					decimal.NewFromFloat(n.target),
+					decimal.NewFromFloat(n.actual),
+					decimal.NewFromFloat(n.stop),
+				}
+				g.Assert(reflect.TypeOf(o).String()).Equal("asset.Order")
+			}
+		})
+	})
 }
 
 func TestRiskRewardRatio(t *testing.T) {
-	for _, n := range orderTests {
-		o := Order{
-			n.brokerAlias,
-			n.volume,
-			decimal.NewFromFloat(n.target),
-			decimal.NewFromFloat(n.actual),
-			decimal.NewFromFloat(n.stop),
-		}
-		rrr := o.RiskRewardRatio()
-		if !rrr.Equals(n.rrr) {
-			t.Errorf("%v should be %v", rrr, n.rrr)
-		}
-	}
-	t.Log(len(orderTests), "test cases")
+	g := goblin.Goblin(t)
+	g.Describe("Risk Reward Ratio", func() {
+		g.It("Should Return A Risk Reward Ratio", func() {
+			for _, n := range orderTests {
+				o := Order{
+					n.brokerAlias,
+					n.volume,
+					decimal.NewFromFloat(n.target),
+					decimal.NewFromFloat(n.actual),
+					decimal.NewFromFloat(n.stop),
+				}
+				rrr := o.RiskRewardRatio()
+				g.Assert(rrr).Equal(n.rrr)
+			}
+		})
+	})
 }
 
 func TestTotalCommission(t *testing.T) {
-	for _, n := range orderTests {
-		o := Order{
-			n.brokerAlias,
-			n.volume,
-			decimal.NewFromFloat(n.target),
-			decimal.NewFromFloat(n.actual),
-			decimal.NewFromFloat(n.stop),
-		}
-		totalCommission, err := o.TotalCommission(n.brokerAlias)
-		if err != nil {
-			t.Error(err)
-		}
-		if !totalCommission.Equals(decimal.NewFromFloat(n.commission)) {
-			t.Errorf("%v should be %v", totalCommission, n.commission)
-		}
-	}
-	t.Log(len(orderTests), "test cases")
+	g := goblin.Goblin(t)
+	g.Describe("Total Commission", func() {
+		g.It("Should Return A Total Commission", func() {
+			for _, n := range orderTests {
+				o := Order{
+					n.brokerAlias,
+					n.volume,
+					decimal.NewFromFloat(n.target),
+					decimal.NewFromFloat(n.actual),
+					decimal.NewFromFloat(n.stop),
+				}
+				totalCommission, err := o.TotalCommission(n.brokerAlias)
+				g.Assert(err == nil).IsTrue()
+				g.Assert(totalCommission).Equal(decimal.NewFromFloat(n.commission).Round(2))
+			}
+		})
+	})
 }
 
 func TestAmount(t *testing.T) {
-	for _, n := range orderTests {
-		o := Order{
-			n.brokerAlias,
-			n.volume,
-			decimal.NewFromFloat(n.target),
-			decimal.NewFromFloat(n.actual),
-			decimal.NewFromFloat(n.stop),
+	g := goblin.Goblin(t)
+	g.Describe("Amount", func() {
+		for _, n := range orderTests {
+			g.It("Should Return A Total Amount Of Order Assets", func() {
+				o := Order{
+					n.brokerAlias,
+					n.volume,
+					decimal.NewFromFloat(n.target),
+					decimal.NewFromFloat(n.actual),
+					decimal.NewFromFloat(n.stop),
+				}
+				amount := o.Amount()
+				g.Assert(amount).Equal(n.amount)
+			})
 		}
-		amount := o.Amount()
-		if amount != n.amount {
-			t.Errorf("%d should be %d", amount, n.amount)
-		}
-	}
-	t.Log(len(orderTests), "test cases")
+	})
 }
 
 func TestGain(t *testing.T) {
-	for _, n := range orderTests {
-		o := Order{
-			n.brokerAlias,
-			n.volume,
-			decimal.NewFromFloat(n.target),
-			decimal.NewFromFloat(n.actual),
-			decimal.NewFromFloat(n.stop),
+	g := goblin.Goblin(t)
+	g.Describe("Gain", func() {
+		for _, n := range orderTests {
+			g.It("Should Return A Maximum Gain Of An Order", func() {
+				o := Order{
+					n.brokerAlias,
+					n.volume,
+					decimal.NewFromFloat(n.target),
+					decimal.NewFromFloat(n.actual),
+					decimal.NewFromFloat(n.stop),
+				}
+				gain, err := o.Gain(n.brokerAlias)
+				g.Assert(err == nil).IsTrue()
+				g.Assert(gain).Equal(decimal.NewFromFloat(n.gain))
+			})
 		}
-		gain, err := o.Gain(n.brokerAlias)
-		if err != nil {
-			t.Error(err)
-		}
-		if !gain.Equals(decimal.NewFromFloat(n.gain)) {
-			t.Errorf("%v should be %v", gain, n.gain)
-		}
-	}
-	t.Log(len(orderTests), "test cases")
+	})
 }
 
 func TestLoss(t *testing.T) {
-	for _, n := range orderTests {
-		o := Order{
-			n.brokerAlias,
-			n.volume,
-			decimal.NewFromFloat(n.target),
-			decimal.NewFromFloat(n.actual),
-			decimal.NewFromFloat(n.stop),
+	g := goblin.Goblin(t)
+	g.Describe("Loss", func() {
+		for _, n := range orderTests {
+			g.It("Should Return A Maximum Loss Of An Order", func() {
+				o := Order{
+					n.brokerAlias,
+					n.volume,
+					decimal.NewFromFloat(n.target),
+					decimal.NewFromFloat(n.actual),
+					decimal.NewFromFloat(n.stop),
+				}
+				loss, err := o.Loss(n.brokerAlias)
+				g.Assert(err == nil).IsTrue()
+				g.Assert(loss).Equal(decimal.NewFromFloat(n.loss))
+			})
 		}
-		loss, err := o.Loss(n.brokerAlias)
-		if err != nil {
-			t.Error(err)
-		}
-		if !loss.Equals(decimal.NewFromFloat(n.loss)) {
-			t.Errorf("%v should be %v", loss, n.loss)
-		}
-	}
-	t.Log(len(orderTests), "test cases")
+	})
 }
 
 func TestEven(t *testing.T) {
-	for _, n := range orderTests {
-		o := Order{
-			n.brokerAlias,
-			n.volume,
-			decimal.NewFromFloat(n.target),
-			decimal.NewFromFloat(n.actual),
-			decimal.NewFromFloat(n.stop),
+	g := goblin.Goblin(t)
+	g.Describe("Even", func() {
+		for _, n := range orderTests {
+			g.It("Should Return A Break Even Of An Order", func() {
+				o := Order{
+					n.brokerAlias,
+					n.volume,
+					decimal.NewFromFloat(n.target),
+					decimal.NewFromFloat(n.actual),
+					decimal.NewFromFloat(n.stop),
+				}
+				even, err := o.Even(n.brokerAlias)
+				g.Assert(err == nil).IsTrue()
+				g.Assert(even).Equal(decimal.NewFromFloat(n.even))
+			})
 		}
-		even, err := o.Even(n.brokerAlias)
-		if err != nil {
-			t.Error(err)
+	})
+}
+
+func TestStopLoss(t *testing.T) {
+	g := goblin.Goblin(t)
+	g.Describe("Stop Loss", func() {
+		for _, n := range stopLossTests {
+			g.It("Should Evaluate A Stop Loss", func() {
+				err := StopLoss(n.actual, n.stop)
+				if n.errExpected == true {
+					g.Assert(err == nil).IsFalse()
+				} else {
+					g.Assert(err == nil).IsTrue()
+				}
+			})
 		}
-		if !even.Equals(decimal.NewFromFloat(n.even)) {
-			t.Errorf("%v should be %v", even, n.even)
-		}
-	}
-	t.Log(len(orderTests), "test cases")
+	})
 }
