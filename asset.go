@@ -22,29 +22,30 @@ type Broker struct {
 // Brokers represents a map of all brokers and their static data
 type Brokers map[string]Broker
 
-// BrokerRegister returns a map of type Brokers which contains all static broker data
+// NewBrokers returns a map of type Brokers which contains all static broker data
 // defined in brokers.json
-func BrokerRegister() (brokers Brokers, err error) {
+func NewBrokers() (Brokers, error) {
 	// please note that the static data can be outdated and does not contain all
 	// brokers.
 	// if your broker and it's rates are missing please add it, and don't hesitate
 	// to send a pull request to https://github.com/MaximilianMeister/asset
+	brokers := &Brokers{}
 	file, err := ioutil.ReadFile("./broker.json")
 	if err != nil {
 		fmt.Printf("File error: %v\n", err)
 		os.Exit(1)
 	}
 
-	if err = json.Unmarshal(file, &brokers); err != nil {
-		return brokers, err
+	if err = json.Unmarshal(file, brokers); err != nil {
+		return nil, err
 	}
 
-	return brokers, nil
+	return *brokers, nil
 }
 
 // IsBroker returns bool if broker is available
 func IsBroker(brokerAlias string) error {
-	register, err := BrokerRegister()
+	register, err := NewBrokers()
 	if err != nil {
 		return err
 	}
@@ -65,7 +66,7 @@ func FindBroker(brokerAlias string) (Broker, error) {
 		return Broker{}, err
 	}
 
-	register, err := BrokerRegister()
+	register, err := NewBrokers()
 	if err != nil {
 		return Broker{}, err
 	}

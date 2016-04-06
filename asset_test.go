@@ -8,18 +8,18 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func TestBrokerRegister(t *testing.T) {
+func TestNewBrokers(t *testing.T) {
 	g := goblin.Goblin(t)
-	g.Describe("Broker Register", func() {
-		b, err := BrokerRegister()
-		for i, n := range brokerRegisterTests {
+	g.Describe("New Brokers", func() {
+		register, err := NewBrokers()
+		for i, n := range newBrokersTests {
 			g.It("Should Return A Map Of Brokers", func() {
 				g.Assert(err == nil).IsTrue()
-				g.Assert(b[i] == n)
-				g.Assert(b[i].BasicPrice == n.BasicPrice)
-				g.Assert(b[i].CommissionRate == n.CommissionRate)
-				g.Assert(b[i].MinRate == n.MinRate)
-				g.Assert(b[i].MaxRate == n.MaxRate)
+				g.Assert(register[i] == n)
+				g.Assert(register[i].BasicPrice == n.BasicPrice)
+				g.Assert(register[i].CommissionRate == n.CommissionRate)
+				g.Assert(register[i].MinRate == n.MinRate)
+				g.Assert(register[i].MaxRate == n.MaxRate)
 			})
 		}
 	})

@@ -4,7 +4,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-var brokerRegisterTests = map[string]Broker{
+var newBrokersTests = map[string]Broker{
 	"onvista": Broker{
 		"OnVista Bank",
 		decimal.NewFromFloat(5.99),
