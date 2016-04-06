@@ -5,56 +5,56 @@ import (
 )
 
 var newBrokersTests = map[string]Broker{
-	"onvista": Broker{
+	"onvista": {
 		"OnVista Bank",
 		decimal.NewFromFloat(5.99),
 		decimal.NewFromFloat(0.0023),
 		decimal.NewFromFloat(5.99),
 		decimal.NewFromFloat(39),
 	},
-	"dab": Broker{
+	"dab": {
 		"DAB Bank",
 		decimal.NewFromFloat(4.95),
 		decimal.NewFromFloat(0.0025),
 		decimal.NewFromFloat(3.99),
 		decimal.NewFromFloat(55),
 	},
-	"targo": Broker{
+	"targo": {
 		"Targo Bank",
 		decimal.NewFromFloat(0),
 		decimal.NewFromFloat(0.0025),
 		decimal.NewFromFloat(8.9),
 		decimal.NewFromFloat(34.9),
 	},
-	"consors": Broker{
+	"consors": {
 		"Consors Bank",
 		decimal.NewFromFloat(4.95),
 		decimal.NewFromFloat(0.0025),
 		decimal.NewFromFloat(9.95),
 		decimal.NewFromFloat(69),
 	},
-	"ingdiba": Broker{
+	"ingdiba": {
 		"ING Diba",
 		decimal.NewFromFloat(0),
 		decimal.NewFromFloat(0.0025),
 		decimal.NewFromFloat(9.9),
 		decimal.NewFromFloat(59.9),
 	},
-	"comdirect": Broker{
+	"comdirect": {
 		".comdirect",
 		decimal.NewFromFloat(4.9),
 		decimal.NewFromFloat(0.0025),
 		decimal.NewFromFloat(9.9),
 		decimal.NewFromFloat(59.9),
 	},
-	"sbroker": Broker{
+	"sbroker": {
 		"SBroker",
 		decimal.NewFromFloat(4.95),
 		decimal.NewFromFloat(0.0025),
 		decimal.NewFromFloat(9.95),
 		decimal.NewFromFloat(49.95),
 	},
-	"maxblue": Broker{
+	"maxblue": {
 		"maxblue",
 		decimal.NewFromFloat(0),
 		decimal.NewFromFloat(0.0025),
