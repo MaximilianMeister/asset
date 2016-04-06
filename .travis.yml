@@ -8,6 +8,7 @@ go:
 
 install:
   - go get github.com/shopspring/decimal
+  - go get github.com/franela/goblin
   - for i in $(ls -d */); do pushd $i 2>&1 >/dev/null; go build .; popd 2>&1 >/dev/null; done
 
 script:
