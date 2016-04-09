@@ -1,7 +1,8 @@
+[![GoDoc](https://godoc.org/github.com/MaximilianMeister/asset?status.svg)](https://godoc.org/github.com/MaximilianMeister/asset)
 ![Build Status](https://travis-ci.org/MaximilianMeister/asset.png?branch=master) ![Go Report Card](http://goreportcard.com/badge/MaximilianMeister/asset)
 
-* `broker` ![Go Cover](https://gocover.io/_badge/github.com/MaximilianMeister/asset/broker)
-* `order` ![Go Cover](https://gocover.io/_badge/github.com/MaximilianMeister/asset/order)
+* [`broker`](https://gocover.io/github.com/MaximilianMeister/asset/order) ![Go Cover](https://gocover.io/_badge/github.com/MaximilianMeister/asset/broker)
+* [`order`](https://gocover.io/github.com/MaximilianMeister/asset/order) ![Go Cover](https://gocover.io/_badge/github.com/MaximilianMeister/asset/order)
 
 # asset
 
@@ -18,7 +19,3 @@ The `order` package allows to calculate future price projections, broker fees an
 * maximum loss
 * break even
 * total commission rates of a specific broker
-
-## Documentation
-
-Documentation can be found on [godoc.org/github.com/MaximilianMeister/asset](https://godoc.org/github.com/MaximilianMeister/asset)
